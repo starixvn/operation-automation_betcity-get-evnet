@@ -1,0 +1,325 @@
+{
+  "name": "Send BetCity Event to Google Sheet",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        -16
+      ],
+      "id": "60dcfdf3-9812-49ab-bc6d-c45afa731407",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "34d5da58-36a7-4b07-91ba-2d8e29f77924",
+      "name": "Loop By Date",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        0,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.sheetId }}",
+          "mode": "id"
+        },
+        "title": "={{ $json.eventDate }}",
+        "options": {}
+      },
+      "id": "d984e260-71b5-4bc2-86df-42116ab9be3c",
+      "name": "Create Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        0
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIcjo08BdvfWnSGY",
+          "name": "Google Sheet Auth - Eason"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "eda12f7a-70b7-4593-97ea-cae238c82bc9",
+      "name": "Loop Events",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        400,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.events;"
+      },
+      "id": "2a050cb2-7da9-4223-baf0-cd620a52679f",
+      "name": "Extract Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Loop Events').item.json.sheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.eventDate }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "eventId"
+          ],
+          "schema": [
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "eventDate",
+              "displayName": "eventDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "eventDateTime",
+              "displayName": "eventDateTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "league",
+              "displayName": "league",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "home",
+              "displayName": "home",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "away",
+              "displayName": "away",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "homeCountry",
+              "displayName": "homeCountry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "awayCountry",
+              "displayName": "awayCountry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f07e649b-db62-4718-9b4b-26bf69fe5d0e",
+      "name": "Append To Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        -128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fIcjo08BdvfWnSGY",
+          "name": "Google Sheet Auth - Eason"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('When Executed by Another Workflow').all();"
+      },
+      "id": "8591cbee-2abf-4c9c-8c5f-0c64264296b2",
+      "name": "Get Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -144
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop By Date": {
+      "main": [
+        [
+          {
+            "node": "Get Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop By Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Events": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Event": {
+      "main": [
+        [
+          {
+            "node": "Append To Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append To Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Loop By Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Event": {
+      "main": [
+        [
+          {
+            "node": "Loop Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5b6e643f-5b42-461c-826d-b38e6677b91e",
+  "meta": {
+    "instanceId": "98bfed1c0f22fa9e07d0e38dc58da94b0281d63095bd4ba14894d42a90a063e3"
+  },
+  "id": "sXecU18lUzdJkzZp",
+  "tags": [
+    {
+      "createdAt": "2025-10-22T06:39:44.591Z",
+      "updatedAt": "2025-10-22T06:39:44.591Z",
+      "id": "fO55yy2m5Cs6Z9j7",
+      "name": "BetCity"
+    }
+  ]
+}
